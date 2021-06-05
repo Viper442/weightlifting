@@ -4,10 +4,13 @@ Workout data and plotting from Starting Strength Official App data.
 @author: Eric S. Smith <esmith4422@gmail.com>
 '''
 
+# Python
 import os
+import json
 
-import pandas as pd
+# Anaconda imports
 import numpy as np
+import pandas as pd
 import matplotlib
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -15,19 +18,10 @@ from matplotlib import rcParams
 from argparse import ArgumentParser
 
 
-###################### EDIT VALUES ###########################
 # Plot columns.  Must match column headers in the db file
 XDATA = ['Date']
 YDATA = ['Squat Weight', 'Deadlift Weight', 'Bench Weight', 'Press Weight', 
          'Power Clean Weight']
-
-# Add injuries here.  Requires two strings in a list
-# E.g., INJURIES.append(['Lower back', '2029-01-01'])
-INJURIES = []
-INJURIES.append(['Tendonitis', '2021-02-24'])
-INJURIES.append(['Right Quad', '2021-03-10'])
-INJURIES.append(['Wisdom Tooth', '2021-03-16'])
-INJURIES.append(['Left Hip', '2021-04-05'])
 
 # Plot settings.  Uncomment desired settings
 #rcParams['figure.figsize'] = 38.40, 21.60 # 4k resolution
@@ -37,7 +31,6 @@ rcParams['figure.figsize'] = 19.20, 10.80 # 1080 resolution
 rcParams['figure.dpi'] = 100
 
 
-###################### EDIT WITH CAUTION ###########################
 def main():
     """ Main function """
     # Add Injuries
@@ -47,22 +40,25 @@ def main():
     
     help_msg = 'filepath to Starting Strength Official App database file'
     parser.add_argument('filename', help=help_msg, nargs='+')
+    help_msg = 'filepath to notes file.  File holds notes for plot.'
+    parser.add_argument('--notefile', help=help_msg)
 
     args = parser.parse_args()
+    print(args)
 
     parse_good = []
     parse_bad = []
     print(f'Executing {__file__}')
     for arg in args.filename:
-        arg = os.path.abspath(arg)
+        fname = os.path.abspath(arg)
         try:
-            print(f'Plotting {arg}...')
-            run(arg)
-            parse_good.append(arg)
-            print(f'Plotting {arg} complete!')
+            print(f'Plotting {fname}...')
+            run(fname, notefile=args.notefile)
+            parse_good.append(fname)
+            print(f'Plotting {fname} complete!')
         except pd.errors.ParserError:
-            print(f'Invalid file: {arg}.  Skipping...')
-            parse_bad.append(arg)
+            print(f'Invalid file: {fname}.  Skipping...')
+            parse_bad.append(fname)
 
     print(f'Executing {__file__} complete!')
 
@@ -74,9 +70,19 @@ def main():
     [print(f'\t{_}') for _ in parse_bad]
 
 
-def run(db_fname):
-    """Creates a plot from a starting strength training log database """
+def run(db_fname, notefile=None):
+    """
+    Creates a plot from a starting strength training log database
+
+    Parameters
+    ----------
+    db_fname : str
+        filepath to dbBackup.csv file
+    notefile : str, optional
+        filepath to json file containing notes
+    """
     db_basename = os.path.basename(db_fname)
+
     # Read in data
     print(f'\tReading {db_fname}')
     df = pd.read_csv(db_fname, header=0, parse_dates=True, 
@@ -133,9 +139,13 @@ def run(db_fname):
     ax.grid(True)
     ax.legend()
 
-    # Add injuries to canvas
+    # Add injuries to canvas.
     injuries = []
-    [injuries.append(Injury(*injury, df, ax)) for injury in INJURIES]
+    if notefile is not None:
+        with open(notefile, 'r') as f1:
+            notes_dict = json.load(f1)
+
+        [injuries.append(Injury(k, v, df, ax)) for k, v in notes_dict.items()]
 
     bbox = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
@@ -153,16 +163,14 @@ def run(db_fname):
     plt.savefig(png_fname)
     print(f'\tSaving {png_fname} complete!')
 
-    #plt.show()
-
 
 class Injury(object):
     """
     Holds data for a weightlifting injury
     """
-    def __init__(self, label, date, df, ax):
-        self.label = label
+    def __init__(self, date, label, df, ax):
         self.date = date
+        self.label = label
         self.df = df
         self.ax = ax
         self.xloc = 0
