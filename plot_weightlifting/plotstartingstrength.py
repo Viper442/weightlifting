@@ -22,15 +22,8 @@ ERROR_DICT = {
     2: 'File missing XDATA column',
 }
 
-# Plot settings.  Uncomment desired settings
-#rcParams['figure.figsize'] = 38.40, 21.60 # 4k resolution
-#rcParams['figure.figsize'] = 25.60, 14.40 # 1440 resolution
-rcParams['figure.figsize'] = 19.20, 10.80 # 1080 resolution
-#rcParams['figure.figsize'] = 19.20, 10.80 # custom resolution
-rcParams['figure.dpi'] = 100
 
-
-def plot_db(db_fname, notefile=None):
+def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
     """
     Creates a plot from a starting strength training log database
 
@@ -40,6 +33,10 @@ def plot_db(db_fname, notefile=None):
         filepath to dbBackup.csv file
     notefile : str, optional
         filepath to json file containing notes
+    figsize : 2-tuple of floats, optional
+        Resolution values.  Default is 1080p: (19.20, 10.80)
+    dpi : int, optional
+        dots per inch of plot
     """
     db_basename = os.path.basename(db_fname)
 
@@ -68,7 +65,10 @@ def plot_db(db_fname, notefile=None):
         return 2
 
     # Plot data
-    #print(f'\tPlotting {db_fname}')
+    rcParams['figure.figsize'] = figsize
+    rcParams['figure.dpi'] = dpi
+
+    print(f'\tPlotting {db_basename}')
     fig, ax = plt.subplots()
 
     # Add axis for pounds
