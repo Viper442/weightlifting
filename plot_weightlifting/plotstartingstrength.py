@@ -121,7 +121,16 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
     injuries = []
     if notefile is not None:
         with open(notefile, 'r') as f1:
-            notes_dict = json.load(f1)
+            try:
+                notes_dict = json.load(f1)
+            except json.decoder.JSONDecodeError:
+                msg = f'Invalid JSON file: {notefile}.'
+                print(f'{msg}.  Skipping...')
+                return msg
+            except UnicodeDecodeError:
+                msg = f'Invalid start byte in file: {notefile}.'
+                print(f'{msg}.  Skipping...')
+                return msg
 
         [injuries.append(Injury(k, v, df, ax)) for k, v in notes_dict.items()]
 
