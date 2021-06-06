@@ -34,7 +34,9 @@ def main():
     parser.add_argument('--figsize', help=help_msg, default='1080p')
     parser.add_argument('--dpi', help='dpi of plot.  Default: 100',
         default=100)
-    help_msg = 'filepath to notes file.  File holds notes for plot.'
+    help_msg = '''filepath to notes file.  File holds notes for plot.  The file
+        must be a JSON file with entries of the format: {"YYYY-MM-DD": "LABEL"}
+        '''
     parser.add_argument('--notefile', help=help_msg)
 
     args = parser.parse_args()
