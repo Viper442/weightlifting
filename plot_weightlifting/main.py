@@ -10,7 +10,7 @@ import os
 import pandas as pd
 from argparse import ArgumentParser
 # Local
-from plot_weightlifting.plotstartingstrength import plot_db
+from plot_weightlifting.plotstartingstrength import plot_db, ERROR_DICT
 
 
 def main():
@@ -35,12 +35,8 @@ def main():
         ret = plot_db(fname, notefile=args.notefile)
         if ret == 0:
             success.append(fname)
-        elif ret == 1:
-            failure.append([fname, 1])
-        elif ret == 2:
-            failure.append([fname, 2])
         else:
-            raise('plot_db: Unknown return status')
+            failure.append([fname, ret])
 
     print(f'Executing {__file__} complete!')
 
@@ -49,14 +45,10 @@ def main():
     [print(f'\t{_}->{os.path.splitext(_)[0]}.png') for _ in success]
 
     print(f'Skipped files:')
-    err_dict = {
-        1: 'Parse failure',
-        2: 'File missing XDATA column',
-    }
 
     for _, err in failure:
         print(f'\t{_}')
-        print(f'\t\tError Code {err}: {err_dict[err]}')
+        print(f'\t\tError Code {err}: {ERROR_DICT[err]}')
 
 
 if __name__ == '__main__':

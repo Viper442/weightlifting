@@ -17,6 +17,11 @@ XDATA = ['Date']
 YDATA = ['Squat Weight', 'Deadlift Weight', 'Bench Weight', 'Press Weight', 
          'Power Clean Weight']
 
+ERROR_DICT = {
+    1: 'Parse failure',
+    2: 'File missing XDATA column',
+}
+
 # Plot settings.  Uncomment desired settings
 #rcParams['figure.figsize'] = 38.40, 21.60 # 4k resolution
 #rcParams['figure.figsize'] = 25.60, 14.40 # 1440 resolution
