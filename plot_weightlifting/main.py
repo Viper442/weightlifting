@@ -1,4 +1,3 @@
-#!/home/ericsmith/anaconda3/bin/python
 '''
 Workout data and plotting from Starting Strength Official App data.
 @author: Eric S. Smith <esmith4422@gmail.com>
@@ -11,7 +10,7 @@ import pkg_resources
 import pandas as pd
 from argparse import ArgumentParser
 # Local
-from plot_weightlifting.plotstartingstrength import (plot_db, ERROR_DICT)
+from plot_weightlifting.plotstartingstrength import plot_db
 from plot_weightlifting.global_vars import (__name__, __version__,
     FIGSIZE_DICT)
 
@@ -32,8 +31,9 @@ def main():
     help_msg = '''figure size of the plot.  Options: 4k, 1080p, 720p, 480p, 
         custom.  Custom usage: --figsize w,h.  w,h are floats representing the
         pixels/100 for width and height.  Default: 1080p: (19.20,10.80)'''
-    parser.add_argument('--figsize', help=help_msg)
-    parser.add_argument('--dpi', help='dpi of plot.  Default: 100')
+    parser.add_argument('--figsize', help=help_msg, default='1080p')
+    parser.add_argument('--dpi', help='dpi of plot.  Default: 100',
+        default=100)
     help_msg = 'filepath to notes file.  File holds notes for plot.'
     parser.add_argument('--notefile', help=help_msg)
 
@@ -42,14 +42,22 @@ def main():
     # Execute plotter on files
     success = []
     failure = []
+    msg = f' {__name__} v{__version__} '
+    print('=' * 80)
+    print(f'{msg:=^80}')
+    print('=' * 80)
     print(f'Executing {__file__}')
 
-    figsize = FIGSIZE_DICT[arg.figsize]
+    try:
+        figsize = FIGSIZE_DICT[args.figsize]
+    except KeyError:
+        figsize = args.figsize
+
     for arg in args.filename:
         fname = os.path.abspath(arg)
         ret = plot_db(fname, notefile=args.notefile,
                       figsize=figsize,
-                      dpi=arg.dpi)
+                      dpi=args.dpi)
         if ret == 0:
             success.append(fname)
         else:
@@ -65,7 +73,7 @@ def main():
 
     for _, err in failure:
         print(f'\t{_}')
-        print(f'\t\tError Code {err}: {ERROR_DICT[err]}')
+        print(f'\t\tError: {err}')
 
 
 if __name__ == '__main__':

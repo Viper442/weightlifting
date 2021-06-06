@@ -1,8 +1,10 @@
+'''
+Module for plotting Starting Strength Official App database files
+'''
 
 # Python
 import os
 import json
-
 # Anaconda imports
 import numpy as np
 import pandas as pd
@@ -16,11 +18,6 @@ from matplotlib import rcParams
 XDATA = ['Date']
 YDATA = ['Squat Weight', 'Deadlift Weight', 'Bench Weight', 'Press Weight', 
          'Power Clean Weight']
-
-ERROR_DICT = {
-    1: 'Parse failure',
-    2: 'File missing XDATA column',
-}
 
 
 def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
@@ -39,6 +36,7 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
         dots per inch of plot
     """
     db_basename = os.path.basename(db_fname)
+    db_name = os.path.splitext(db_basename)[0]
 
     # Read in data
     try:
@@ -46,10 +44,11 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
         df = pd.read_csv(db_fname, header=0, parse_dates=True, 
                          infer_datetime_format=True)
     except pd.errors.ParserError:
-        print(f'Invalid file: {db_fname}.  Skipping...')
-        return 1
+        msg = f'Failed to parse file'
+        print(f'{msg}.  Skipping...')
+        return msg
 
-    print(f'\tPreprocessing {db_basename}')
+    print(f'\tPreprocessing {db_name}...',)
     # Strip leading white spaces from columns
     df.columns = [col.lstrip() for col in df.columns]
 
@@ -61,14 +60,25 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
         df[XDATA[0]] = [mdates.num2date(mdates.datestr2num(_)) for _ in
             df[XDATA[0]]]
     except KeyError:
-        print(f'Invalid file: {db_fname}.  Skipping...')
-        return 2
+        msg = f'File is missing {XDATA[0]} column'
+        print(f'{msg}.  Skipping...')
+        return msg
 
     # Plot data
-    rcParams['figure.figsize'] = figsize
-    rcParams['figure.dpi'] = dpi
+    try:
+        rcParams['figure.figsize'] = figsize
+    except ValueError:
+        msg = f'Invalid figsize: {figsize}'
+        print(f'{msg}.  Skipping...')
+        return msg
+    try:
+        rcParams['figure.dpi'] = dpi
+    except ValueError:
+        msg = f'Invalid dpi: {dpi}'
+        print(f'{msg}.  Skipping...')
+        return msg
 
-    print(f'\tPlotting {db_basename}')
+    print(f'\tPlotting {db_name}...')
     fig, ax = plt.subplots()
 
     # Add axis for pounds
@@ -126,10 +136,10 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
     fig.tight_layout()
 
     # Output
-    png_fname = os.path.splitext(db_basename)[0] + '.png'
+    png_fname = f'{db_name}.png'
     print(f'\tSaving {png_fname}...')
     plt.savefig(png_fname)
-    print(f'\tSaving {png_fname} complete!')
+    print(f'\t{png_fname} saved!')
 
     return 0
 
