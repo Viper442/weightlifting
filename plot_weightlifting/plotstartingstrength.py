@@ -1,8 +1,3 @@
-#!/home/ericsmith/anaconda3/bin/python
-'''
-Workout data and plotting from Starting Strength Official App data.
-@author: Eric S. Smith <esmith4422@gmail.com>
-'''
 
 # Python
 import os
@@ -15,7 +10,6 @@ import matplotlib
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-from argparse import ArgumentParser
 
 
 # Plot columns.  Must match column headers in the db file
@@ -31,46 +25,7 @@ rcParams['figure.figsize'] = 19.20, 10.80 # 1080 resolution
 rcParams['figure.dpi'] = 100
 
 
-def main():
-    """ Main function """
-    # Add Injuries
-    description = '''Plots Starting Strength Official App data.  
-        Output png will be named after database file'''
-    parser = ArgumentParser(description=description)
-    
-    help_msg = 'filepath to Starting Strength Official App database file'
-    parser.add_argument('filename', help=help_msg, nargs='+')
-    help_msg = 'filepath to notes file.  File holds notes for plot.'
-    parser.add_argument('--notefile', help=help_msg)
-
-    args = parser.parse_args()
-    print(args)
-
-    parse_good = []
-    parse_bad = []
-    print(f'Executing {__file__}')
-    for arg in args.filename:
-        fname = os.path.abspath(arg)
-        try:
-            print(f'Plotting {fname}...')
-            run(fname, notefile=args.notefile)
-            parse_good.append(fname)
-            print(f'Plotting {fname} complete!')
-        except pd.errors.ParserError:
-            print(f'Invalid file: {fname}.  Skipping...')
-            parse_bad.append(fname)
-
-    print(f'Executing {__file__} complete!')
-
-    # Summary
-    print(f'Successfully processed files:')
-    [print(f'\t{_}') for _ in parse_good]
-
-    print(f'Skipped files:')
-    [print(f'\t{_}') for _ in parse_bad]
-
-
-def run(db_fname, notefile=None):
+def plot_db(db_fname, notefile=None):
     """
     Creates a plot from a starting strength training log database
 
@@ -201,8 +156,4 @@ class Injury(object):
         bounds_delta = bounds[1] - bounds[0]
         epsilon = 0.05 # small amount to shift text boxes from XDATA[0] value
         self.yloc = injuries_yvals / bounds_delta - epsilon
-
-
-if __name__ == '__main__':
-    main()
 
