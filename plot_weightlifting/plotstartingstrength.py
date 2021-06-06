@@ -39,9 +39,13 @@ def plot_db(db_fname, notefile=None):
     db_basename = os.path.basename(db_fname)
 
     # Read in data
-    print(f'\tReading {db_fname}')
-    df = pd.read_csv(db_fname, header=0, parse_dates=True, 
-                     infer_datetime_format=True)
+    try:
+        print(f'\tReading {db_fname}')
+        df = pd.read_csv(db_fname, header=0, parse_dates=True, 
+                         infer_datetime_format=True)
+    except pd.errors.ParserError:
+        print(f'Invalid file: {db_fname}.  Skipping...')
+        return 1
 
     print(f'\tPreprocessing {db_basename}')
     # Strip leading white spaces from columns
@@ -51,8 +55,12 @@ def plot_db(db_fname, notefile=None):
     length = len(YDATA[0].split()[-1]) + 1
 
     # Convert date strings to dates data
-    df[XDATA[0]] = [mdates.num2date(mdates.datestr2num(_)) for _ in
-        df[XDATA[0]]]
+    try:
+        df[XDATA[0]] = [mdates.num2date(mdates.datestr2num(_)) for _ in
+            df[XDATA[0]]]
+    except KeyError:
+        print(f'Invalid file: {db_fname}.  Skipping...')
+        return 2
 
     # Plot data
     #print(f'\tPlotting {db_fname}')
@@ -117,6 +125,8 @@ def plot_db(db_fname, notefile=None):
     print(f'\tSaving {png_fname}...')
     plt.savefig(png_fname)
     print(f'\tSaving {png_fname} complete!')
+
+    return 0
 
 
 class Injury(object):

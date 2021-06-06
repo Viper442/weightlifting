@@ -27,31 +27,36 @@ def main():
 
     args = parser.parse_args()
 
-    parse_good = []
-    parse_bad = []
+    success = []
+    failure = []
     print(f'Executing {__file__}')
     for arg in args.filename:
         fname = os.path.abspath(arg)
-        try:
-            print(f'Plotting {fname}...')
-            plot_db(fname, notefile=args.notefile)
-            parse_good.append(fname)
-            print(f'Plotting {fname} complete!')
-        except pd.errors.ParserError:
-            print(f'Invalid file: {fname}.  Skipping...')
-            parse_bad.append(fname)
-        except KeyError:
-            print(f'Invalid file: {fname}.  Skipping...')
-            parse_bad.append(fname)
+        ret = plot_db(fname, notefile=args.notefile)
+        if ret == 0:
+            success.append(fname)
+        elif ret == 1:
+            failure.append([fname, 1])
+        elif ret == 2:
+            failure.append([fname, 2])
+        else:
+            raise('plot_db: Unknown return status')
 
     print(f'Executing {__file__} complete!')
 
     # Summary
     print(f'Successfully processed files:')
-    [print(f'\t{_}') for _ in parse_good]
+    [print(f'\t{_}->{os.path.splitext(_)[0]}.png') for _ in success]
 
     print(f'Skipped files:')
-    [print(f'\t{_}') for _ in parse_bad]
+    err_dict = {
+        1: 'Parse failure',
+        2: 'File missing XDATA column',
+    }
+
+    for _, err in failure:
+        print(f'\t{_}')
+        print(f'\t\tError Code {err}: {err_dict[err]}')
 
 
 if __name__ == '__main__':
