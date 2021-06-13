@@ -35,7 +35,9 @@ def main():
     parser.add_argument('--dpi', help='dpi of plot.  Default: 100',
         default=100)
     help_msg = '''filepath to notes file.  File holds notes for plot.  The file
-        must be a JSON file with entries of the format: {"YYYY-MM-DD": "LABEL"}
+        must be a JSON file with entries of the format: {"YYYY-MM-DD": {"label":
+        "LABEL", "ydata": YDATA}}.  YDATA must match an exercase header in the 
+        training log.
         '''
     parser.add_argument('--notefile', help=help_msg)
 

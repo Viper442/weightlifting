@@ -117,7 +117,7 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
     ax.grid(True)
     ax.legend()
 
-    # Add injuries to canvas.
+    # Add notes or injuries to canvas.
     injuries = []
     if notefile is not None:
         with open(notefile, 'r') as f1:
@@ -132,7 +132,7 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
                 print(f'{msg}.  Skipping...')
                 return msg
 
-        [injuries.append(Injury(k, v, df, ax)) for k, v in notes_dict.items()]
+        [injuries.append(Injury(k, v['label'], v['ydata'], df, ax)) for k, v in notes_dict.items()]
 
     bbox = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
@@ -156,14 +156,30 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
 class Injury(object):
     """
     Holds data for a weightlifting injury
+
+    Attributes
+    ----------
+    date : datetime
+        {YYYY-MM-DD}
+    label : str
+        Text to display on plot
+    ydata : str
+        Column header text of a lift.  Must match an entry in YDATA.  Places 
+        text box above the marker for this lift.
+    df : Pandas.DataFrame
+        Dataframe holding training data
+    ax : Matplotlib.Axes
+        Axes object
     """
-    def __init__(self, date, label, df, ax):
+    def __init__(self, date, label, ydata, df, ax):
         self.date = date
         self.label = label
+        self.ydata = ydata
         self.df = df
         self.ax = ax
         self.xloc = 0
         self.yloc = 0
+        self.default_yloc = 0.05 
         self._add_hours()
         self.date_start = df[XDATA[0]].iloc[0]
         self.date_end = df[XDATA[0]].iloc[-1]
@@ -185,7 +201,16 @@ class Injury(object):
     def get_yloc(self):
         """Gets the yloc [0, 1] of the injury date"""
         df1 = self.df[XDATA[0]]==self.date
-        injuries_yvals = self.df[df1][YDATA[0]].values
+        injuries_yvals = self.df[df1][self.ydata].values
+
+        # Use default yloc if NaN value for ydata.  
+        if pd.isna(injuries_yvals):
+            print('\tWarning! '
+                  f'Found NaN value for {self.date}.  Defaulting to '
+                  f'yloc={self.default_yloc}.')
+            self.yloc = self.default_yloc
+            return
+
         bounds = self.ax.get_ybound()
         bounds_delta = bounds[1] - bounds[0]
         epsilon = 0.05 # small amount to shift text boxes from XDATA[0] value
