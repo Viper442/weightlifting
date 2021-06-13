@@ -37,10 +37,20 @@ various notes you would like to add to the plot, such as marking achievements
 or injuries.  The form is:
 ```
 {
-    'YYYY-MM-XX': 'LABEL1',
-    'YYYY-MM-XX': 'LABEL2'
+    "YYYY-MM-XX": {"label": 'LABEL1',
+                   "ydata": 'YDATA'},
+    "YYYY-MM-XX": {"label": 'LABEL2',
+                   "ydata": 'YDATA'},
 }
 ```
+
+LABEL will be displayed in the textbox.  YDATA is the exercise in which to
+post the textbox next to.  It must match a column header from the training
+log.  
+
+> note:
+> If no lift matching YDATA occured on the date, then it will use a default
+> location to place the textbox.
 
 The output will be png files, which will just replace the extension of the 
 input file with '.png'.  You can plot multiple csv files at once, provided 
