@@ -73,7 +73,8 @@ def main():
     print(f'Successfully processed files:')
     [print(f'\t{_}->{os.path.splitext(_)[0]}.png') for _ in success]
 
-    print(f'Skipped files:')
+    if len(failure) > 0;
+        print(f'Skipped files:')
 
     for _, err in failure:
         print(f'\t{_}')
