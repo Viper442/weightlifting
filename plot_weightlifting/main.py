@@ -70,11 +70,13 @@ def main():
     print(f'Executing {__file__} complete!')
 
     # Print Summary
-    print(f'Successfully processed files:')
+    if len(success) > 0:
+        print('Successfully processed files:')
+
     [print(f'\t{_}->{os.path.splitext(_)[0]}.png') for _ in success]
 
     if len(failure) > 0:
-        print(f'Skipped files:')
+        print('Skipped files:')
 
     for _, err in failure:
         print(f'\t{_}')
