@@ -48,7 +48,7 @@ LABEL will be displayed in the textbox.  YDATA is the exercise in which to
 post the textbox next to.  It must match a column header from the training
 log.  
 
-Alternatives for YDATA are :default, top, bottom, which will place the label 
+Alternatives for YDATA are: default, top, bottom, which will place the label 
 at the predefined locations.
 
 > note:

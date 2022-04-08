@@ -24,14 +24,17 @@ def main():
     
     help_msg = 'filepath to Starting Strength Official App database file'
     parser.add_argument('filename', help=help_msg, nargs='+')
+
     help_msg = 'display version and exit'
     parser.add_argument('-v', '-V', '--version', help=help_msg,
                         action='version', 
                         version=f'{__name__} v{__version__}')
+
     help_msg = '''figure size of the plot.  Options: 4k, 1080p, 720p, 480p, 
         custom.  Custom usage: --figsize w,h.  w,h are floats representing the
         pixels/100 for width and height.  Default: 1080p: (19.20,10.80)'''
     parser.add_argument('--figsize', help=help_msg, default='1080p')
+
     parser.add_argument('--dpi', help='dpi of plot.  Default: 100',
         default=100)
     help_msg = '''filepath to notes file.  File holds notes for plot.  The file
@@ -40,6 +43,12 @@ def main():
         training log.
         '''
     parser.add_argument('--notefile', help=help_msg)
+
+    help_msg = '''frequency of xticks and labels.  Options: Week, Month, Year.
+        Default: Month
+        '''
+    parser.add_argument('--xtick-frequency', help=help_msg,
+        default='month', type=str)
 
     args = parser.parse_args()
 
@@ -61,7 +70,8 @@ def main():
         fname = os.path.abspath(arg)
         ret = plot_db(fname, notefile=args.notefile,
                       figsize=figsize,
-                      dpi=args.dpi)
+                      dpi=args.dpi,
+                      xtick_frequency=args.xtick_frequency)
         if ret == 0:
             success.append(fname)
         else:

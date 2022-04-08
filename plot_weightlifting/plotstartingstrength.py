@@ -20,7 +20,8 @@ YDATA = ['Squat Weight', 'Deadlift Weight', 'Bench Weight', 'Press Weight',
          'Power Clean Weight']
 
 
-def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
+def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100, 
+            xtick_frequency='month'):
     """
     Creates a plot from a starting strength training log database
 
@@ -34,6 +35,8 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
         Resolution values.  Default is 1080p: (19.20, 10.80)
     dpi : int, optional
         dots per inch of plot
+    xtick_frequency : str, optional
+        Major xtick frequency: Year, Month, Week
     """
     db_basename = os.path.basename(db_fname)
     db_name = os.path.splitext(db_basename)[0]
@@ -96,10 +99,20 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
         y2 = 2.2 * y1 # convert kg -> pounds
         ax2.plot(x2[ymask], y2[ymask], label=y[:-length], marker='.', 
                  linestyle='-')
-        
-    # Set tickmarks to Mondays
-    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0))
-    ax.xaxis.set_minor_locator(mdates.DayLocator())
+    
+    if xtick_frequency.lower() == 'week':
+        # Set tickmarks to Mondays
+        ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0))
+        ax.xaxis.set_minor_locator(mdates.DayLocator())
+        ax.set_xlabel('Monday Date (YYYY/MM/DD)')
+    elif xtick_frequency.lower() == 'month':
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_minor_locator(mdates.WeekdayLocator())
+        ax.set_xlabel('First of Month Date (YYYY/MM)')
+    elif xtick_frequency.lower() == 'year':
+        ax.xaxis.set_major_locator(mdates.YearLocator())
+        ax.xaxis.set_minor_locator(mdates.MonthLocator())
+        ax.set_xlabel('First of Year Date (YYYY)')
 
     # Set pound ylabels to align with kg labels
     l = ax.get_ylim()
@@ -110,11 +123,17 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
 
     # Set plot labels
     ax.set_title('Strength Progress')
-    ax.set_xlabel('Monday Date (YYYY/MM/DD)')
     ax.set_ylabel('Mass (kg)')
     ax2.set_ylabel('Weight (lbs)')
 
-    ax.grid(True)
+    kwargs = {'linestyle': '-',
+              'linewidth': 1,
+    }
+    ax.grid(True, which='major', **kwargs)
+    kwargs = {'linestyle': '--',
+              'linewidth': 0.5,
+    }
+    ax.grid(True, which='minor', **kwargs)
     ax.legend()
 
     # Add notes or injuries to canvas.
@@ -196,6 +215,8 @@ class Injury(object):
 
     def get_xloc(self):
         """Gets the xloc [0, 1] of the injury date"""
+        #TODO: Add date interpolation for notes.  Currently crashes with date 
+        # not listed in date column
         bounds = self.ax.get_xbound()
         bounds_delta = bounds[1] - bounds[0]
         self.xloc = (mdates.datestr2num(self.date) - bounds[0]) / bounds_delta
