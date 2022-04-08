@@ -109,7 +109,7 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100):
     ax2.yaxis.set_major_locator(matplotlib.ticker.FixedLocator(ticks))
 
     # Set plot labels
-    ax.set_title('Starting Strength Progress')
+    ax.set_title('Strength Progress')
     ax.set_xlabel('Monday Date (YYYY/MM/DD)')
     ax.set_ylabel('Mass (kg)')
     ax2.set_ylabel('Weight (lbs)')
