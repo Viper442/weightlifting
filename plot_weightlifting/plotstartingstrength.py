@@ -156,6 +156,8 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100,
     bbox = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 
     for i in range(len(injuries)):
+        t1 = mdates.datestr2num(injuries[i].date)
+        ax.axvline(x=t1, linestyle='--', color='grey')
         ax.text(injuries[i].xloc, injuries[i].yloc, injuries[i].label, 
                 transform=ax.transAxes, bbox=bbox, rotation=30)
 
