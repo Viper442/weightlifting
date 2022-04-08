@@ -180,6 +180,8 @@ class Injury(object):
         self.xloc = 0
         self.yloc = 0
         self.default_yloc = 0.05 
+        self.bottom_yloc = 0.01 
+        self.top_yloc = 0.90 
         self._add_hours()
         self.date_start = df[XDATA[0]].iloc[0]
         self.date_end = df[XDATA[0]].iloc[-1]
@@ -201,6 +203,16 @@ class Injury(object):
     def get_yloc(self):
         """Gets the yloc [0, 1] of the injury date"""
         df1 = self.df[XDATA[0]]==self.date
+        if self.ydata.lower() == 'default':
+            self.yloc = self.default_yloc
+            return
+        elif self.ydata.lower() == 'top':
+            self.yloc = self.top_yloc
+            return
+        elif self.ydata.lower() == 'bottom':
+            self.yloc = self.bottom_yloc
+            return
+
         injuries_yvals = self.df[df1][self.ydata].values
 
         # Use default yloc if NaN value for ydata.  
