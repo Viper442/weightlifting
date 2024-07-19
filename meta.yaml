@@ -1,0 +1,15 @@
+package:
+  name: weightlifting_plotter
+  version: 0.2.0
+
+requirements:
+  build:
+    - python
+    - flit
+
+  run:
+    - python
+    - requests
+    - matplotlib
+    - numpy
+    - pandas
