@@ -55,6 +55,8 @@ def plot_db(db_fname, notefile=None, figsize=(19.20, 10.80), dpi=100,
     # Strip leading white spaces from columns
     df.columns = [col.lstrip() for col in df.columns]
 
+    df = df.dropna()
+
     # length of the ' Weight' to subtract for the legend headers
     length = len(YDATA[0].split()[-1]) + 1
 
